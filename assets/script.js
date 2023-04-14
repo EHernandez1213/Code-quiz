@@ -32,8 +32,8 @@ var questions = [
         answer: "console.log",
     },
 ];
-
-var i =0;
+var highscores = [];
+var questionindex =0;
 var time = 60;
 
 document.getElementById('startBtn').onclick = function(){
@@ -44,7 +44,7 @@ document.getElementById('startBtn').onclick = function(){
 showQuestion();
 
 setInterval(()=>{
-if(time >0 && i< questions.length);
+if(time >0 && questionindex< questions.length)
     {time --
     document.getElementById('time').innerHTML = time}
 }, 1000);
@@ -54,19 +54,20 @@ if(time >0 && i< questions.length);
 }
 
 function showQuestion(){
-if(i< questions.length){
+if(questionindex< questions.length){
 
     document.getElementById('question').innerHTML=
     `
-    <p>${questions[i].title}</p>
+    <p>${questions[questionindex].title}</p>
     `
     document.getElementById('answers').innerHTML=
     `
-    <button>${questions[i].choices[0]}</button>
-    <button>${questions[i].choices[1]}</button>
-    <button>${questions[i].choices[2]}</button>
-    <button>${questions[i].choices[3]}</button>
+    <button class='btns'>${questions[questionindex].choices[0]}</button>
+    <button class='btns'>${questions[questionindex].choices[1]}</button>
+    <button class='btns'>${questions[questionindex].choices[2]}</button>
+    <button class='btns'>${questions[questionindex].choices[3]}</button>
     `
+    
 } else{
     displayScore();
 }
@@ -74,13 +75,14 @@ if(i< questions.length){
 
 
 document.getElementById('answers').onclick= function(e){
-    if(e.target.innerText ==questions[i].answer ){
+    if(e.target.innerText ==questions[questionindex].answer ){
         document.getElementById('check').innerHTML = 'correct';
     }else{
         document.getElementById('check').innerHTML = 'wrong';
-        time -+ 10;
+        time -= 10;
+        console.log(time);
     }
-i++
+questionindex++
 showQuestion();
 }
 
@@ -90,15 +92,53 @@ function displayScore(){
     document.getElementById('answers').style.display='none';
     document.getElementById('check').style.display='none';
     document.getElementById('scores').innerHTML = time;
+    document.getElementById('time').style.display='none';
+    document.getElementById('highscoreBtn').style.display='block';
 }
 
-document.getElementById('submitBtn').onclick= function (){
-    var name = document.getElementById('name').value;
-    localStorage.setItem('name', JSON.stringify(name));
-    localStorage.setItem('score', JSON.stringify(time));
+document.getElementById('playAgainBtn').onclick = function(){
+    questionindex=0;
+    time=60;
+    document.getElementById('playAgainBtn').style.display ='none';
+    document.getElementById('final').style.display ='none';
+    document.getElementById('submitBtn').style.display ='block';
+    document.getElementById('scores').style.display ='block';
+    document.getElementById('question').style.display ='block';
+    document.getElementById('answers').style.display ='block';
+    document.getElementById('check').style.display ='block';
+    document.getElementById('time').style.display ='block';
+    
+
+showQuestion();
+
 
 }
+
+ document.getElementById('submitBtn').onclick= function (){
+     var name = document.getElementById('name').value;
+     highscores.push({name,time});
+     localStorage.setItem('highscores', JSON.stringify(highscores));
+
+ }
+
+
+
 
 document.getElementById('highscoreBtn').onclick= function (){
-    var highscores = JSON.parse(localStorage.getItem('name'))
+    localStorage.setItem("highscores", JSON.stringify(highscores));
+    document.getElementById('final').style.display='none';
+    document.getElementById('scores').style.display='none';
+    document.getElementById('submitBtn').style.display='none';
+    document.getElementById('intro').style.display='none';
+    document.getElementById('startBtn').style.display='none';
+    document.getElementById('highscores').style.display='block';
+    
+    for (let i=0; i < highscores.length; i++) {
+        let scoreObj = highscores[i];
+        let li = document.createElement("li");
+        li.textContent = scoreObj.name + ": " + scoreObj.time;
+        document.getElementById('highscores').append(li);
+
+    }
+    
 }
